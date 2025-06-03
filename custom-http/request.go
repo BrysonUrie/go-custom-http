@@ -43,7 +43,7 @@ func createRequest(request string) (*Request, error) {
 		}
 		split := strings.Split(header, ":")
 		if len(split) < 2 {
-			continue
+			return nil, fmt.Errorf("Header in improper format: %s", header)
 		}
 		headers[split[0]] = split[1]
 	}
