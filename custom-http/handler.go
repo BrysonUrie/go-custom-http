@@ -5,7 +5,7 @@ import (
 	"syscall"
 )
 
-func Listen(portNum int) {
+func listen(portNum int) {
 	fd, err := syscall.Socket(
 		syscall.AF_INET,
 		syscall.SOCK_STREAM,

@@ -1,3 +1,4 @@
 ### Paths
 [] create path parsing
-[] register functions to paths
+[x] register functions to paths
+[] support differnt content-types
