@@ -15,7 +15,7 @@ func CreateRouter() (*Router, error) {
 	}, nil
 }
 
-func (router *Router) RegisterPath(path string, handler func(*Request) string) error {
+func (router *Router) RegisterPath(path string, handler func(*Request) (*Response, error)) error {
 	pathObj := &Path{
 		PurePath: path,
 		Handler:  handler,
@@ -75,31 +75,26 @@ func (router *Router) handleConnection(connFd int) {
 	request := string(buf[:n])
 
 	req, _ := createRequest(request)
-	fmt.Println(req)
 
 	handler, err := router.getHandler(req.Uri)
-	if err != nil {
-		fmt.Println(err)
-	} else {
+	var res *Response = nil
 
-		go handler.Handler(req)
+	if err != nil {
+		res = CreateNotFoundRes()
+	} else {
+		res, err = handler.Handler(req)
+		if err != nil {
+			res = CreateInternalErrorRes()
+		}
 	}
 
-	response := "HTTP/1.1 200 OK\r\n" +
-		"Content-Type: text/plain\r\n" +
-		"Content-Length: 13\r\n" +
-		"\r\n" +
-		"Hello, world!"
-
-	_, err = syscall.Write(connFd, []byte(response))
+	_, err = syscall.Write(connFd, []byte(res.serializeResponse()))
 	if err != nil {
 		fmt.Println("Write failed:", err)
 	}
-
 }
 
 func (router *Router) getHandler(goal string) (*Path, error) {
-
 	for path, handler := range router.Paths {
 		if path == goal {
 			return handler, nil

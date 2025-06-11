@@ -37,7 +37,17 @@ func (response *Response) serializeResponse() string {
 
 	return fmt.Sprintf("HTTP/1.1 %d %s\r\n", response.Status, reason) +
 		"Content-Type: text/plain\r\n" +
-		fmt.Sprintf("Content-Length: %d", len(response.Body)) +
+		fmt.Sprintf("Content-Length: %d\r\n", len(response.Body)) +
 		"\r\n" +
 		response.Body
+}
+
+func CreateNotFoundRes() *Response {
+	res, _ := CreateResponse(404, "No resource found\r\n")
+	return res
+}
+
+func CreateInternalErrorRes() *Response {
+	res, _ := CreateResponse(500, "Error processing request\r\n")
+	return res
 }
